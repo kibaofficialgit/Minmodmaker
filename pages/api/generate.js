@@ -1,4 +1,4 @@
-import { generateAddon } from "../../lib/generator";
+const { generateAddon } = require("../../lib/generator");
 
 export default async function handler(req, res) {
   if (req.method === "POST") {
