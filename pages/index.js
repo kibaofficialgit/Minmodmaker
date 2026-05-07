@@ -3,46 +3,191 @@ import { useState } from "react";
 export default function Home() {
   const [name, setName] = useState("");
   const [damage, setDamage] = useState(1);
+  const [loading, setLoading] = useState(false);
 
   const generate = async () => {
-    const res = await fetch("/api/generate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ name, damage })
-    });
+    if (!name) {
+      alert("Please enter an item name");
+      return;
+    }
 
-    const blob = await res.blob();
-    const url = window.URL.createObjectURL(blob);
+    setLoading(true);
 
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${name}.mcaddon`;
-    a.click();
+    try {
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name, damage })
+      });
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${name}.mcaddon`;
+      a.click();
+    } catch (err) {
+      alert("Something went wrong");
+    }
+
+    setLoading(false);
   };
 
   return (
-    <div style={{ padding: 40 }}>
-      <h1>Minecraft Mod Maker</h1>
+    <div style={styles.page}>
+      <div style={styles.card}>
+        <h1 style={styles.title}>Minecraft Mod Maker</h1>
 
-      <input
-        placeholder="Item name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
+        <p style={styles.subtitle}>
+          Create custom Minecraft Bedrock items instantly.
+        </p>
 
-      <br /><br />
+        <div style={styles.formGroup}>
+          <label style={styles.label}>Item Name</label>
 
-      <input
-        type="number"
-        value={damage}
-        onChange={(e) => setDamage(e.target.value)}
-      />
+          <input
+            style={styles.input}
+            placeholder="Excalibur Sword"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
 
-      <br /><br />
+        <div style={styles.formGroup}>
+          <label style={styles.label}>Damage</label>
 
-      <button onClick={generate}>Generate</button>
+          <input
+            style={styles.input}
+            type="number"
+            value={damage}
+            onChange={(e) => setDamage(e.target.value)}
+          />
+        </div>
+
+        <button style={styles.button} onClick={generate}>
+          {loading ? "Generating..." : "Generate Addon"}
+        </button>
+
+        <div style={styles.preview}>
+          <h3 style={{ marginBottom: 10 }}>Preview</h3>
+
+          <div style={styles.previewCard}>
+            <div style={styles.previewIcon}></div>
+
+            <div>
+              <p style={styles.previewName}>
+                {name || "Custom Item"}
+              </p>
+
+              <p style={styles.previewDamage}>
+                Damage: {damage}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
+
+const styles = {
+  page: {
+    minHeight: "100vh",
+    background: "linear-gradient(135deg, #0f172a, #111827)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    fontFamily: "Arial"
+  },
+
+  card: {
+    width: "100%",
+    maxWidth: 420,
+    background: "#1e293b",
+    borderRadius: 20,
+    padding: 30,
+    boxShadow: "0 10px 30px rgba(0,0,0,0.4)",
+    color: "white"
+  },
+
+  title: {
+    fontSize: 38,
+    marginBottom: 10,
+    fontWeight: "bold"
+  },
+
+  subtitle: {
+    color: "#94a3b8",
+    marginBottom: 30
+  },
+
+  formGroup: {
+    marginBottom: 20
+  },
+
+  label: {
+    display: "block",
+    marginBottom: 8,
+    fontWeight: "bold"
+  },
+
+  input: {
+    width: "100%",
+    padding: 14,
+    borderRadius: 12,
+    border: "1px solid #334155",
+    background: "#0f172a",
+    color: "white",
+    fontSize: 16,
+    outline: "none",
+    boxSizing: "border-box"
+  },
+
+  button: {
+    width: "100%",
+    padding: 15,
+    border: "none",
+    borderRadius: 12,
+    background: "#22c55e",
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+    cursor: "pointer",
+    marginTop: 10
+  },
+
+  preview: {
+    marginTop: 30
+  },
+
+  previewCard: {
+    background: "#0f172a",
+    padding: 15,
+    borderRadius: 12,
+    display: "flex",
+    alignItems: "center",
+    gap: 15
+  },
+
+  previewIcon: {
+    width: 50,
+    height: 50,
+    background: "#22c55e",
+    borderRadius: 10
+  },
+
+  previewName: {
+    fontWeight: "bold",
+    fontSize: 18,
+    margin: 0
+  },
+
+  previewDamage: {
+    color: "#94a3b8",
+    marginTop: 5
+  }
+};
