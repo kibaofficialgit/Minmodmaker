@@ -4,6 +4,8 @@ export default function Home() {
   const [name, setName] = useState("");
   const [damage, setDamage] = useState(1);
   const [loading, setLoading] = useState(false);
+ const [texture, setTexture] = useState(null);
+const [preview, setPreview] = useState("");
 
   const generate = async () => {
     if (!name) {
